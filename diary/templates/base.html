@@ -31,12 +31,18 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarResponsive">
+            <!-- ナビ左側メニュー -->
             <ul class="navbar-nav mr-auto">
               <li class="nav-item {% block active_inquiry %}{% endblock %}">
                 <a class="nav-link" href="{% url 'diary:inquiry' %}">INQUIRY</a>
               </li>
+              {% if user.is_authenticated %}
+              <li class="nav-item {% block active_diary_list %}{% endblock %}">
+                <a class="nav-link" href="{% url 'diary:diary_list' %}">DIARY LIST</a>
+              </li>
+              {% endif %}
             </ul>
-            <!--  -->
+            <!-- ナビ右側メニュー -->
             <ul class="navbar-nav ml-auto">
               {% if user.is_authenticated %}
               <li class="nav-item">
@@ -51,7 +57,6 @@
               </li>
               {% endif %}
             </ul>
-            <!--  -->
           </div>
         </div>
     </nav>

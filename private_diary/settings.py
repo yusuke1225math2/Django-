@@ -26,12 +26,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0w!0o74y0y0xi4h3%7n#w)_2b1dz(7vu9fpi)309*9=zse36ra'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# 許可するホスト名のリスト
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
+
+# 静的ファイルを設置する場所
 
 
 # Application definition
+STATIC_ROOT = '/usr/share/nginx/html/static'
+MEDIA_ROOT = '/usr/share/nginx/html/media'
+
+# Amazon SES関連設定
+AWS_SES_ACCESS_KEY_ID = os.environ.get('AWS_SES_ACCESS_KEY_ID')
+AWS_SES_SECRET_ACCESS_KEY = os.environ.get('AWS_SES_SECRET_ACCESS_KEY')
+EMAIL_BACKEND = 'django_ses.SESBackend'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -46,7 +56,9 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'allauth.socialaccount'
+    'allauth.socialaccount',
+
+    'django_ses'
 ]
 
 MIDDLEWARE = [
@@ -153,16 +165,20 @@ LOGGING = {
         # diaryアプリケーションが利用するロガー
         'diary': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
     },
 
     # ハンドラの設定
     'handlers': {
         'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'dev'
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'formatter': 'prod',
+            'when': 'D',
+            'interval': 1,
+            'backupCount': 7,
         },
     },
 
@@ -213,7 +229,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandantory'
 ACCOUNT_EMAIL_REQUIRED = True
 
 # ログイン/ログアウト後の遷移先を指定
-LOGIN_REDIRECT_URL = 'diary:index'
+LOGIN_REDIRECT_URL = 'diary:diary_list'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
 # ログアウトリンクのクリック一発でログアウトする設定
@@ -225,6 +241,8 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 # デフォルトのメール送信元を設定
 DEFAULT_FROM_EMAIL = 'admin@example.com'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 MEDIA_URL = '/media/'
+
+# バックアップ用
+BACKUP_PATH = 'backup/'
+NUM_SAVED_BACKUP = 30

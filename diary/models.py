@@ -5,7 +5,7 @@ from django.db import models
 class Diary(models.Model):
     """日記モデル"""
 
-    user = models.ForeignKey(CustomUser, verbose_name='ユーザー', on_delete=models.PROTECT(collector, field, sub_objs, using))
+    user = models.ForeignKey(CustomUser, verbose_name='ユーザー', on_delete=models.PROTECT)
     title = models.CharField(verbose_name='タイトル', max_length=40)
     content = models.TextField(verbose_name='本文', blank=True, null=True)
     photo1 = models.ImageField(verbose_name='写真1', blank=True, null=True)
